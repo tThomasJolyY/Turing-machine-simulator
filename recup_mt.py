@@ -18,10 +18,9 @@ def create_dic(path):
             etat = []
             car = []
             i = 0
-            while ligne[i] != ",":
+            while ligne[i-1] != ",":
                 etat.append(ligne[i])
                 i+=1
-            i+=1
             while i < len(ligne)-1:
                 if ligne[i] != ",":
                     car.append(ligne[i])
@@ -44,7 +43,8 @@ def create_dic(path):
                 i+=1
             i+=1
             while i < len(ligne)-1 :
-                mouv.append(ligne[i])
+                if ligne[i] != ",":
+                    mouv.append(ligne[i])
                 i+=1
             lecture_etat = True
             lecture_transition = False
