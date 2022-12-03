@@ -89,13 +89,30 @@ class Machine:
         return False
         
     def lancer_machine(self):
+        print("Les caractères coloriés correspondent a la position du curseur sur chacun des rubans")
         while self.etat_courant != "F":
+            print("Etat actuelle:",self.etat_courant)
+            for ruban in range(self.nb_rubans):
+                if self.position[ruban] == 0:
+                    print("Ruban {} : \033[91m {} \033[0m{}".format(ruban,self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
+                elif self.position[ruban] == len(self.rubans[ruban]) - 1:
+                    print("Ruban {} : {} \033[91m{} \033[0m".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]))
+                else:
+                    print("Ruban {} : {} \033[91m{}\033[0m {}".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
             res = self.pas()
             if not res:
                 print("Le mot que vous avez entré n'est pas reconnu par la machine de turing")
                 return False
         print("Voici l'état de la machine dans son état finale")
-        print(self)
+        print("Etat actuelle:",self.etat_courant)
+        for ruban in range(self.nb_rubans):
+            if self.position[ruban] == 0:
+                print("Ruban {} : \033[91m {} \033[0m{}".format(ruban,self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
+            elif self.position[ruban] == len(self.rubans[ruban]) - 1:
+                print("Ruban {} : {} \033[91m{} \033[0m".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]))
+            else:
+                print("Ruban {} : {} \033[91m{}\033[0m {}".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
+        #print(self)
         return True
 
 mt_test = Machine("mt.txt")
