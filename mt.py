@@ -16,7 +16,10 @@ class Machine:
         self.position = []
         self.nb_pas = 0
         self.rubans = []
-        self.entrée(mot)        
+        self.entrée(mot)
+
+    def effacer_ruban(self,i):
+        self.rubans[i] = []     
 
     def calc_nb_rubans(self):
         for elt in self.dic_etatstrans.items():
@@ -49,6 +52,20 @@ class Machine:
         else:
             self.etats_rubans.append(self.rubans[0][0])
         self.position = [0 for _ in range(self.nb_rubans)]
+    
+    def left(self,i):
+        self.position[i] = len(self.rubans[i])
+    
+    def search(self,i,a):
+        for car in range(len(self.rubans[i])):
+            if self.rubans[i][car] == a:
+                self.position[i] = car
+
+    def erase_ruban(self,i):
+        self.rubans[i] = []
+
+    def copy(self,i,j):
+        self.rubans[j] = self.rubans[i]
 
     def __str__(self):
         l = "".join(str([self.rubans,self.etats_rubans,self.position,self.etat_courant,self.nb_pas]))
@@ -120,4 +137,3 @@ mt_test.entrée("100")
 mt_test.lancer_machine()
 mt_test.reset("001")
 mt_test.pas()
-print(mt_test)
