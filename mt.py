@@ -2,6 +2,7 @@ from recup_mt import create_dic
 
 class Machine:
     def __init__(self,fichier) -> None:
+        self.input = None
         self.dic_etatstrans = create_dic(fichier)
         self.nb_rubans = self.calc_nb_rubans()
         self.etats_rubans = []
@@ -48,6 +49,7 @@ class Machine:
         return self.dic_etatstrans
 
     def entrée(self,mot):
+        self.input = mot
         self.rubans.append(list(mot))
         if self.nb_rubans > 1:
             self.rubans.append(["_" for _ in range(self.nb_rubans-1)])
@@ -101,6 +103,9 @@ class Machine:
         return False
         
     def lancer_machine(self):
+        if self.input == None:
+            print("t'as pas précisé d'entrée sale fou")
+            return False
         print("Les caractères coloriés correspondent a la position du curseur sur chacun des rubans")
         while self.etat_courant != "F":
             self.afficher()
@@ -121,26 +126,31 @@ class Machine:
             else:
                 print("Ruban {} : {} \033[91m{}\033[0m {}".format(ruban+1," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
 
+    def __str__(self):
+        l = "".join(str([self.rubans,self.etats_rubans,self.position,self.etat_courant,self.nb_pas]))
+        return l
+
 
 def linker(m1,m2,entrée):
     m1.entrée(entrée)
-    while m1.get_etat_courant() != "M'":
-        m1.pas()
-    m1.afficher()
-    print("Transition vers la machine m2 :")
-    m2.set_rubans(m1.get_rubans())
-    m2.set_position_lecture(m1.get_position_lecture())
-    while m2.get_etat_courant() != "F":
-        m2.pas()
-    m2.afficher()
-    print("m2 a fini son calcul, retour a la machine m1 :")
-    m1.set_rubans(m2.get_rubans())
-    m1.set_position_lecture(m2.get_position_lecture())
     while m1.get_etat_courant() != "F":
         m1.pas()
+        if m1.get_etat_courant() == "M'":
+            m1.afficher()
+            print("Transition vers la machine m2 :")
+            m2.set_rubans(m1.get_rubans())
+            m2.set_position_lecture(m1.get_position_lecture())
+            while m2.get_etat_courant() != "F":
+                m2.pas()
+            m2.afficher()
+            print("m2 a fini son calcul, retour a la machine m1 :")
+            m1.set_rubans(m2.get_rubans())
+            m1.set_position_lecture(m2.get_position_lecture())
     m1.afficher()
     print("m1 a fini son calcul")
 
 mt_copy = Machine("copyij.txt")
 mt_erase = Machine("erasei.txt")
-linker(mt_copy,mt_erase,"1101")
+print(mt_copy.get_dic())
+print(mt_erase.get_dic())
+#linker(mt_copy,mt_erase,"1101")
