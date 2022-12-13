@@ -1,5 +1,6 @@
 MOVES = [">","<","-"]
 
+
 def create_dic(path):
     with open(path) as f:
         l = f.readlines()
@@ -22,8 +23,12 @@ def create_dic(path):
                 etat.append(ligne[i])
                 i+=1
             while i < len(ligne)-1:
-                if ligne[i] != ",":
+                if ligne[i] == "M" and ligne[i+1] == "'":
+                    liste_transitions.append(["M'",ligne[i+3:len(ligne)-1]])
+                    i = len(ligne)
+                elif ligne[i] != ",":
                     car.append(ligne[i])
+                
                 i+=1
             lecture_etat = False
             lecture_transition = True
@@ -53,4 +58,5 @@ def create_dic(path):
     for k in range(len(liste_etats)):
         etats_transitions["".join(liste_etats[k])] = liste_transitions[k]
     return etats_transitions
+
 

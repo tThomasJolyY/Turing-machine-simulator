@@ -18,9 +18,6 @@ class Machine:
         self.rubans = []
         self.entrée(mot)
 
-    def effacer_ruban(self,i):
-        self.rubans[i] = []     
-
     def calc_nb_rubans(self):
         for elt in self.dic_etatstrans.items():
             for car in range(len(elt[0])):
@@ -34,11 +31,18 @@ class Machine:
     def get_etat_ruban(self):
         return self.etats_rubans
 
-    def position_lecture(self):
+    def get_position_lecture(self):
         return self.position
 
-    def get_transitions(self):
-        pass
+    def get_rubans(self):
+        return self.rubans
+
+    def set_rubans(self,nv_rub):
+        self.rubans = nv_rub
+    
+    def set_position_lecture(self,nv_pos):
+        self.position = nv_pos
+        self.etats_rubans= [self.rubans[i][self.position[i]] for i in range(self.nb_rubans)]
 
     def get_dic(self):
         return self.dic_etatstrans
@@ -47,40 +51,28 @@ class Machine:
         self.rubans.append(list(mot))
         if self.nb_rubans > 1:
             self.rubans.append(["_" for _ in range(self.nb_rubans-1)])
-            self.etats_rubans= ["_" for _ in range(self.nb_rubans)]
-            self.etats_rubans[0] = self.rubans[0][0]
+            self.etats_rubans= [self.rubans[i][0] for i in range(self.nb_rubans)]
         else:
             self.etats_rubans.append(self.rubans[0][0])
         self.position = [0 for _ in range(self.nb_rubans)]
-    
-    def left(self,i):
-        self.position[i] = len(self.rubans[i])
-    
-    def search(self,i,a):
-        for car in range(len(self.rubans[i])):
-            if self.rubans[i][car] == a:
-                self.position[i] = car
-
-    def erase_ruban(self,i):
-        self.rubans[i] = []
-
-    def copy(self,i,j):
-        self.rubans[j] = self.rubans[i]
-
-    def __str__(self):
-        l = "".join(str([self.rubans,self.etats_rubans,self.position,self.etat_courant,self.nb_pas]))
-        return str(l)
-
+   
     def pas(self):
         if self.rubans == []:
             print("Veuillez spécifier une entrée")
+        self.afficher()
+        if self.etat_courant == "M'":
+            for elt in self.dic_etatstrans.items():
+                transi = elt[1]
+                if transi[0] == "M'":
+                    self.etat_courant = transi[1]
+                    return True
         for elt in self.dic_etatstrans.items():
             etat = elt[0]
             transi = elt[1]
             etat_courant_comp = "".join([etat[:car] for car in range(len(etat)) if etat[car] == ","])
             if etat_courant_comp == self.etat_courant:
                 etats_comp = "".join([etat[car+1:] for car in range(len(etat)) if etat[car] == ","])
-                if "".join(self.etats_rubans) == etats_comp:
+                if "".join(self.etats_rubans) == etats_comp and transi[0] != "M'":
                     self.etat_courant = transi[0]
                     for ruban_i in range(self.nb_rubans):
                         self.rubans[ruban_i][self.position[ruban_i]] = transi[1][ruban_i] 
@@ -103,37 +95,52 @@ class Machine:
                     self.nb_pas += 1
                 #print(mt_test)
                     return True
+                elif "".join(self.etats_rubans) == etats_comp:
+                    self.etat_courant = transi[0]
+                    return True
         return False
         
     def lancer_machine(self):
         print("Les caractères coloriés correspondent a la position du curseur sur chacun des rubans")
         while self.etat_courant != "F":
-            print("Etat actuelle:",self.etat_courant)
-            for ruban in range(self.nb_rubans):
-                if self.position[ruban] == 0:
-                    print("Ruban {} : \033[91m {} \033[0m{}".format(ruban,self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
-                elif self.position[ruban] == len(self.rubans[ruban]) - 1:
-                    print("Ruban {} : {} \033[91m{} \033[0m".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]))
-                else:
-                    print("Ruban {} : {} \033[91m{}\033[0m {}".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
+            self.afficher()
             res = self.pas()
             if not res:
                 print("Le mot que vous avez entré n'est pas reconnu par la machine de turing")
                 return False
         print("Voici l'état de la machine dans son état finale")
+        self.afficher()
+
+    def afficher(self):
         print("Etat actuelle:",self.etat_courant)
         for ruban in range(self.nb_rubans):
             if self.position[ruban] == 0:
-                print("Ruban {} : \033[91m {} \033[0m{}".format(ruban,self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
+                print("Ruban {} : \033[91m {} \033[0m{}".format(ruban+1,self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
             elif self.position[ruban] == len(self.rubans[ruban]) - 1:
-                print("Ruban {} : {} \033[91m{} \033[0m".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]))
+                print("Ruban {} : {} \033[91m{} \033[0m".format(ruban+1," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]))
             else:
-                print("Ruban {} : {} \033[91m{}\033[0m {}".format(ruban," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
-        #print(self)
-        return True
+                print("Ruban {} : {} \033[91m{}\033[0m {}".format(ruban+1," ".join(self.rubans[ruban][:self.position[ruban]]),self.rubans[ruban][self.position[ruban]]," ".join(self.rubans[ruban][self.position[ruban]+1:])))
 
-mt_test = Machine("mt.txt")
-mt_test.entrée("100")
-mt_test.lancer_machine()
-mt_test.reset("001")
-mt_test.pas()
+
+def linker(m1,m2,entrée):
+    m1.entrée(entrée)
+    while m1.get_etat_courant() != "M'":
+        m1.pas()
+    m1.afficher()
+    print("Transition vers la machine m2 :")
+    m2.set_rubans(m1.get_rubans())
+    m2.set_position_lecture(m1.get_position_lecture())
+    while m2.get_etat_courant() != "F":
+        m2.pas()
+    m2.afficher()
+    print("m2 a fini son calcul, retour a la machine m1 :")
+    m1.set_rubans(m2.get_rubans())
+    m1.set_position_lecture(m2.get_position_lecture())
+    while m1.get_etat_courant() != "F":
+        m1.pas()
+    m1.afficher()
+    print("m1 a fini son calcul")
+
+mt_copy = Machine("copyij.txt")
+mt_erase = Machine("erasei.txt")
+linker(mt_copy,mt_erase,"1101")
