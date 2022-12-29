@@ -19,6 +19,9 @@ class Machine:
         self.rubans = []
         self.entrée(mot)
 
+    def get_nb_rub(self):
+        return self.nb_rubans
+
     def calc_nb_rubans(self):
         for elt in self.dic_etatstrans.items():
             for car in range(len(elt[0])):
@@ -61,7 +64,6 @@ class Machine:
     def pas(self):
         if self.rubans == []:
             print("Veuillez spécifier une entrée")
-        self.afficher()
         if self.etat_courant == "M'":
             for elt in self.dic_etatstrans.items():
                 transi = elt[1]
@@ -95,7 +97,6 @@ class Machine:
                     for etat_rub in range(self.nb_rubans):
                         self.etats_rubans[etat_rub] = self.rubans[etat_rub][self.position[etat_rub]]
                     self.nb_pas += 1
-                #print(mt_test)
                     return True
                 elif "".join(self.etats_rubans) == etats_comp:
                     self.etat_courant = transi[0]
@@ -149,8 +150,62 @@ def linker(m1,m2,entrée):
     m1.afficher()
     print("m1 a fini son calcul")
 
+#faire en sorte que m1 puisse appeler m2 n fois
+def create_m3(m1,m2):
+    dic1 = m1.get_dic()
+    dic2 = m2.get_dic()
+    dic3 = {}
+    etat_r = []
+    i = 0
+    for trans in dic1.items():
+        if "M'" not in trans[1]:
+            dic3[trans[0]] = trans[1]
+        else:
+            etat_r.append(trans[1][1])
+            sep = trans[0].split(",")
+            nom_apellei = "".join(["m",str(i),"I"])
+            dic3[trans[0]] = [nom_apellei,[sep[1][i] for i in range(len(sep[1]))],["-" for _ in range(m1.get_nb_rub())]]
+            i += 1
+    for appels in range(i):
+        for trans in dic2.items():
+            if "F" not in trans[1]:
+                nv_trans = trans[1]
+                nom_trans = "".join(["m",str(appels)])
+                nv_trans[0] = "".join([nom_trans,nv_trans[0]])
+                dic3["".join([nom_trans,trans[0]])] = nv_trans
+            else:
+                nv_trans1 = trans[1]
+                nv_trans1[0] = etat_r[appels]
+                nom_trans = "".join(["m",str(appels)])
+                dic3["".join([nom_trans,trans[0]])] = nv_trans1
+    return write_m3(dic3)
+
+def write_m3(dic):
+    fichier = open("m3.txt","w")
+    for trans in dic.items():
+        ligne1 = []
+        ligne2 = []
+        char = 0
+        while trans[0][char] != ",":
+            ligne1.append(trans[0][char])
+            char += 1
+        char += 1
+        while char < len(trans[0]):
+            ligne1.append(",")
+            ligne1.append(trans[0][char])
+            char += 1
+        ligne2.append(trans[1][0])
+        ligne2.append(",".join(trans[1][1]))
+        ligne2.append(",".join(trans[1][2]))
+        fichier.write("".join(ligne1))
+        fichier.write("\n")
+        fichier.write(",".join(ligne2))
+        fichier.write("\n\n")
+    fichier.close()
+    return Machine("m3.txt")
+
 mt_copy = Machine("copyij.txt")
 mt_erase = Machine("erasei.txt")
-print(mt_copy.get_dic())
-print(mt_erase.get_dic())
-#linker(mt_copy,mt_erase,"1101")
+m3 = create_m3(mt_copy,mt_erase)
+m3.entrée("1001")
+m3.lancer_machine()
