@@ -55,7 +55,8 @@ class Machine:
         self.input = mot
         self.rubans.append(list(mot))
         if self.nb_rubans > 1:
-            self.rubans.append(["_" for _ in range(self.nb_rubans-1)])
+            for _ in range(self.nb_rubans-1):
+                self.rubans.append(["_"])
             self.etats_rubans= [self.rubans[i][0] for i in range(self.nb_rubans)]
         else:
             self.etats_rubans.append(self.rubans[0][0])
@@ -131,26 +132,6 @@ class Machine:
         l = "".join(str([self.rubans,self.etats_rubans,self.position,self.etat_courant,self.nb_pas]))
         return l
 
-
-def linker(m1,m2,entrée):
-    m1.entrée(entrée)
-    while m1.get_etat_courant() != "F":
-        m1.pas()
-        if m1.get_etat_courant() == "M'":
-            m1.afficher()
-            print("Transition vers la machine m2 :")
-            m2.set_rubans(m1.get_rubans())
-            m2.set_position_lecture(m1.get_position_lecture())
-            while m2.get_etat_courant() != "F":
-                m2.pas()
-            m2.afficher()
-            print("m2 a fini son calcul, retour a la machine m1 :")
-            m1.set_rubans(m2.get_rubans())
-            m1.set_position_lecture(m2.get_position_lecture())
-    m1.afficher()
-    print("m1 a fini son calcul")
-
-#faire en sorte que m1 puisse appeler m2 n fois
 def create_m3(m1,m2):
     dic1 = m1.get_dic()
     dic2 = m2.get_dic()
@@ -169,15 +150,20 @@ def create_m3(m1,m2):
     for appels in range(i):
         for trans in dic2.items():
             if "F" not in trans[1]:
-                nv_trans = trans[1]
+                #print(trans)
+                nv_trans = trans[1][0]
                 nom_trans = "".join(["m",str(appels)])
-                nv_trans[0] = "".join([nom_trans,nv_trans[0]])
-                dic3["".join([nom_trans,trans[0]])] = nv_trans
+                nv_trans = "".join([nom_trans,nv_trans])
+                #print(nv_trans)
+                dic3["".join([nom_trans,trans[0]])] = [nv_trans,trans[1][1],trans[1][2]]
+                #print("".join([nom_trans,trans[0]]),dic3["".join([nom_trans,trans[0]])])
             else:
-                nv_trans1 = trans[1]
-                nv_trans1[0] = etat_r[appels]
+                #print(trans,appels)
+                nv_trans1 = trans[1][0]
+                nv_trans1 = etat_r[appels]
                 nom_trans = "".join(["m",str(appels)])
-                dic3["".join([nom_trans,trans[0]])] = nv_trans1
+                #print(trans[1])
+                dic3["".join([nom_trans,trans[0]])] = [nv_trans1,trans[1][1],trans[1][2]]
     return write_m3(dic3)
 
 def write_m3(dic):
@@ -195,6 +181,7 @@ def write_m3(dic):
             ligne1.append(trans[0][char])
             char += 1
         ligne2.append(trans[1][0])
+        #print(trans)
         ligne2.append(",".join(trans[1][1]))
         ligne2.append(",".join(trans[1][2]))
         fichier.write("".join(ligne1))
@@ -204,8 +191,8 @@ def write_m3(dic):
     fichier.close()
     return Machine("m3.txt")
 
-mt_copy = Machine("copyij.txt")
-mt_erase = Machine("erasei.txt")
-m3 = create_m3(mt_copy,mt_erase)
-m3.entrée("1001")
-m3.lancer_machine()
+add = Machine("addition.txt")
+mult = Machine("multiplication.txt")
+mult_eg = create_m3(mult,add)
+mult_eg.entrée("100*0101")
+mult_eg.lancer_machine()

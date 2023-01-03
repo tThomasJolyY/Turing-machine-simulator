@@ -15,7 +15,7 @@ def create_dic(path):
     lecture_transition = False
 
     for ligne in l:
-        if len(ligne) > 1 and lecture_etat:
+        if (len(ligne) > 1 and lecture_etat) or "M'" in ligne:
             etat = []
             car = []
             i = 0
@@ -30,8 +30,12 @@ def create_dic(path):
                     car.append(ligne[i])
                 
                 i+=1
-            lecture_etat = False
-            lecture_transition = True
+            if "M'" not in ligne:
+                lecture_etat = False
+                lecture_transition = True
+            else:
+                lecture_etat = True
+                lecture_transition = False
             liste_etats.append(["".join(etat),"".join(car)])
         elif len(ligne) > 1 and lecture_transition:
             etatnv = []
@@ -51,6 +55,7 @@ def create_dic(path):
                 if ligne[i] != ",":
                     mouv.append(ligne[i])
                 i+=1
+            print(mouv)
             lecture_etat = True
             lecture_transition = False
             liste_transitions.append(["".join(etatnv),carnv,mouv])
