@@ -2,6 +2,7 @@ from recup_mt import create_dic
 
 class Machine:
     def __init__(self,fichier) -> None:
+        self.nom = fichier
         self.input = None
         self.dic_etatstrans = create_dic(fichier)
         self.nb_rubans = self.calc_nb_rubans()
@@ -10,6 +11,9 @@ class Machine:
         self.position = []
         self.nb_pas = 0
         self.rubans = []
+
+    def get_nom(self):
+        return self.nom
 
     def reset(self,mot):
         self.etat_courant = "I"
@@ -79,6 +83,7 @@ class Machine:
                 etats_comp = "".join([etat[car+1:] for car in range(len(etat)) if etat[car] == ","])
                 if "".join(self.etats_rubans) == etats_comp and transi[0] != "M'":
                     self.etat_courant = transi[0]
+                    print(transi)
                     for ruban_i in range(self.nb_rubans):
                         self.rubans[ruban_i][self.position[ruban_i]] = transi[1][ruban_i] 
                     for transition in range(self.nb_rubans): 
@@ -164,10 +169,11 @@ def create_m3(m1,m2):
                 nom_trans = "".join(["m",str(appels)])
                 #print(trans[1])
                 dic3["".join([nom_trans,trans[0]])] = [nv_trans1,trans[1][1],trans[1][2]]
-    return write_m3(dic3)
+    nv_nom = "".join([m1.get_nom()[:-4],m2.get_nom()[:-4],".txt"])
+    return write_m3(dic3,nv_nom)
 
-def write_m3(dic):
-    fichier = open("m3.txt","w")
+def write_m3(dic,nom):
+    fichier = open(nom,"w")
     for trans in dic.items():
         ligne1 = []
         ligne2 = []
@@ -189,10 +195,10 @@ def write_m3(dic):
         fichier.write(",".join(ligne2))
         fichier.write("\n\n")
     fichier.close()
-    return Machine("m3.txt")
+    return Machine(nom)
 
-add = Machine("addition.txt")
 mult = Machine("multiplication.txt")
+add = Machine("addition.txt")
 mult_eg = create_m3(mult,add)
-mult_eg.entrée("100*0101")
+mult_eg.entrée("011*010")
 mult_eg.lancer_machine()

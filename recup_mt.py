@@ -55,7 +55,6 @@ def create_dic(path):
                 if ligne[i] != ",":
                     mouv.append(ligne[i])
                 i+=1
-            print(mouv)
             lecture_etat = True
             lecture_transition = False
             liste_transitions.append(["".join(etatnv),carnv,mouv])
