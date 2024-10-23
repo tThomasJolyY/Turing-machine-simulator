@@ -47,7 +47,7 @@ class Machine:
 
     def set_rubans(self,nv_rub):
         self.rubans = nv_rub
-    
+
     def set_position_lecture(self,nv_pos):
         self.position = nv_pos
         self.etats_rubans= [self.rubans[i][self.position[i]] for i in range(self.nb_rubans)]
@@ -65,7 +65,7 @@ class Machine:
         else:
             self.etats_rubans.append(self.rubans[0][0])
         self.position = [0 for _ in range(self.nb_rubans)]
-   
+
     def pas(self):
         if self.rubans == []:
             print("Veuillez spécifier une entrée")
@@ -85,13 +85,13 @@ class Machine:
                     self.etat_courant = transi[0]
                     print(transi)
                     for ruban_i in range(self.nb_rubans):
-                        self.rubans[ruban_i][self.position[ruban_i]] = transi[1][ruban_i] 
-                    for transition in range(self.nb_rubans): 
+                        self.rubans[ruban_i][self.position[ruban_i]] = transi[1][ruban_i]
+                    for transition in range(self.nb_rubans):
                         if transi[2][transition] == ">":
                             self.position[transition] += 1
                             if len(self.rubans[transition]) <= self.position[transition]:
                                 self.rubans[transition].append("_")
-                        if transi[2][transition] == "<": 
+                        if transi[2][transition] == "<":
                             self.position[transition] -= 1
                             if self.position[transition] < 0:
                                 old_rub = [elt for elt in self.rubans[transition]]
@@ -108,7 +108,7 @@ class Machine:
                     self.etat_courant = transi[0]
                     return True
         return False
-        
+
     def lancer_machine(self):
         if self.input == None:
             print("t'as pas précisé d'entrée sale fou")
@@ -197,6 +197,8 @@ def write_m3(dic,nom):
     fichier.close()
     return Machine(nom)
 
+
+#change here if you want to test other files
 mult = Machine("multiplication.txt")
 add = Machine("addition.txt")
 mult_eg = create_m3(mult,add)
