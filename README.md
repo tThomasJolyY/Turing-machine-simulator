@@ -1,4 +1,4 @@
-# Orojet-théorie-des-langages
+# Projet-théorie-des-langages
 
 
 This is a simple simulation of a turing's machine done in python.
