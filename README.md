@@ -1,4 +1,4 @@
-# Projet-théorie-des-langages
+# Turing machine simulator
 
 
 This is a simple simulation of a turing's machine done in python.
